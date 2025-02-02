@@ -22,7 +22,6 @@
             display: flex;
             align-items: center;
             justify-content: start;
-            background: blue;
         }
         .container
         {
@@ -38,10 +37,11 @@
         .groundContainer
         {
             width: 80%;
-            height: 57px;
+            padding: 5px;
             background-color: #eee0e0;
             position: relative;
             display: flex;
+            align-items: center;
             border-radius: 50px;
             overflow: hidden;
         }
@@ -60,8 +60,7 @@
         #enemyContainer
         {
             width: 80%;
-            height: calc(100vh - 100px);
-            background: red;
+            height: calc(100vh - 57px);
             z-index: 1;
         }
         .enemy
@@ -116,7 +115,7 @@
             font-weight: 800;
 
         }
-         #gameover
+        #gameover
         {
             position: absolute;
             top: 10px;
@@ -128,7 +127,7 @@
             }
             .container 
             {
-                width: 70%;
+                width: 90%;
                 height: 100dvh;
             }
             .groundContainer
@@ -140,12 +139,6 @@
                 width: 100%;
             }
         }
-        @media (max-width: 900px){
-            .container 
-            {
-                width: 90%;
-            }
-        }
         @media (max-width: 550px) {
             .container 
             {
@@ -155,10 +148,11 @@
     </style>
 </head>
 <body>
+        <!-- <p id="pointCount">0</p> -->
+    <p id="gameover"></p>
+
     <div class="container">
-        <div id="enemyContainer">
-            <p id="gameover"></p>
-        </div>
+        <div id="enemyContainer"></div>
         <div class="groundContainer">
             <div id="player"></div>
         </div>
