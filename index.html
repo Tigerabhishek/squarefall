@@ -21,7 +21,7 @@
             height: 100vh;
             display: flex;
             align-items: center;
-            justify-content: start;
+            justify-content: center;
         }
         .container
         {
@@ -110,21 +110,36 @@
             background-color: purple;
             position: relative;
         }
+        .scoreContainer
+        {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            position: absolute;
+        }
         #pointCount
         {
             font-weight: 800;
-
+            font-size: 75px;
+            color: tomato;
         }
         #gameover
         {
-            position: absolute;
-            top: 10px;
+            font-weight: 800;
+            font-size: 75px;
+            color: tomato;
         }
         @media (max-width: 900px){
-            body 
-            {
-                flex-direction: column;
-            }
+            body
+        {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: start;
+            flex-direction: column;
+        }
             .container 
             {
                 width: 90%;
@@ -148,13 +163,14 @@
     </style>
 </head>
 <body>
-        <!-- <p id="pointCount">0</p> -->
-    <p id="gameover"></p>
-
     <div class="container">
         <div id="enemyContainer"></div>
         <div class="groundContainer">
             <div id="player"></div>
+        </div>
+        <div class="scoreContainer">
+            <h1 id="pointCount">0</h1>
+            <h1 id="gameover"></h1>
         </div>
     </div>
     <script>
@@ -235,7 +251,7 @@
                                 playerRect.top > enemyRect.bottom);
 
                 if (overlap){
-                    gameover.innerHTML = 'GAMEOVER';
+                    gameover.innerHTML = 'GAMEOVER!';
                     isGameOver = true;  // Set game state to over
                 }
             });
@@ -291,7 +307,9 @@
 
                 if (overlap){
                     score++;
-                    player.innerHTML = score;
+                    // player.innerHTML = score;
+                    pointCount.innerHTML = score;
+
                     point.remove(); // Remove the point once it is collected
                 }
             });
