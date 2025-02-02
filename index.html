@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
+    <title>SQUARE FALL</title>
+    <style>
+        *
+        {
+            margin: 0;
+            padding: 0;
+            font-family: "Montserrat", serif;
+            box-sizing: border-box;
+        }
+        body
+        {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container
+        {
+            width: 50%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 10px;
+            overflow: hidden;
+        }
+        .groundContainer
+        {
+            width: 80%;
+            height: 57px;
+            background-color: #eee0e0;
+            position: relative;
+            display: flex;
+            border-radius: 50px;
+            overflow: hidden;
+        }
+        #player
+        {
+            height: 50px;
+            width: 50px;
+            background-color: tomato;
+            border-radius: 50%;
+            position: relative;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #enemyContainer
+        {
+            width: 80%;
+            height: 100vh;
+            z-index: 1;
+        }
+        .enemy
+        {
+            height: 50px;
+            width: 50px;
+            /* background-color: #121212; */
+            position: relative;
+            top: 0;
+            animation: 3s enemycome linear infinite;
+        }
+        @keyframes enemycome {
+            0%{
+                top: 0%;
+                scale: 0.3;
+            }
+            20%{
+                top: 20%;
+                transform: rotate(20deg);
+                scale: 0.3;
+            }
+            40%{
+                top: 40%;
+                transform: rotate(40deg);
+                scale: 0.6;
+            }
+            60%{
+                top: 60%;
+                transform: rotate(60deg);
+                scale: 0.8;
+            }
+            80%{
+                top: 80%;
+                transform: rotate(80deg);
+                scale: 1;
+            }
+            100%{
+                top: 100%;
+                transform: rotate(100deg);
+                transform: scale(1);
+            }
+        }
+        .point 
+        {
+            height: 50px;
+            width: 50px;
+            background-color: purple;
+            position: relative;
+        }
+        #pointCount
+        {
+            font-weight: 800;
+
+        }
+        @media (max-width: 900px){
+            body 
+            {
+                flex-direction: column;
+            }
+            .container 
+            {
+                width: 70%;
+            }
+            .groundContainer
+            {
+                width: 100%;
+            }
+            #enemyContainer
+            {
+                width: 100%;
+            }
+        }
+        @media (max-width: 900px){
+            .container 
+            {
+                width: 90%;
+            }
+        }
+        @media (max-width: 550px) {
+            .container 
+            {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <!-- <p id="pointCount">0</p> -->
+        <p id="gameover"></p>
+    </div>
+    <div class="container">
+        <div id="enemyContainer"></div>
+        <div class="groundContainer">
+            <div id="player"></div>
+        </div>
+    </div>
+    <script>
+        const player = document.getElementById('player');
+        const groundContainer = document.querySelector('.groundContainer');
+        let score = 0;
+        let isGameOver = false;  // Game state flag
+
+        document.onkeydown = function(e) {
+            if (isGameOver) return;  // Do nothing if game is over
+
+            const px = parseInt(window.getComputedStyle(player).getPropertyValue('left'));
+            const groundWidth = groundContainer.offsetWidth;
+            const playerWidth = player.offsetWidth;
+            const playerHeight = player.offsetHeight;
+
+            if (e.keyCode === 39) { // Right arrow key
+                let newLeft = px + 10; // Increment by 10 pixels (adjust as needed)
+
+                // Boundary Check
+                if (newLeft + playerWidth > groundWidth) {
+                    newLeft = groundWidth - playerWidth;  // prevent going beyond the boundary
+                }
+                player.style.left = newLeft + 'px';
+            } else if (e.keyCode === 37) { // Left arrow key
+                let newLeft = px - 10;
+                if (newLeft < 0) {
+                    newLeft = 0;
+                }
+                player.style.left = newLeft + 'px';
+            }
+        };
+
+        const enemyContainer = document.getElementById('enemyContainer');
+        // generate enemy
+        function generateEnemy(){
+            if (isGameOver) return;  // Do nothing if game is over
+
+            const enemyBox = document.createElement('div');
+            enemyBox.classList.add('enemy');
+
+            const enemyWidth = 50;
+            const enemyHeight = 50;
+
+            //random position
+            const x = Math.floor(Math.random() * (enemyContainer.offsetWidth - enemyWidth));
+            const y = Math.floor(Math.random() * (enemyContainer.offsetHeight - enemyHeight));
+            enemyBox.style.left = x + 'px';
+            enemyBox.style.top = y + 'px';
+
+            //random color
+            var r = Math.floor(Math.random() * 256)
+            var g = Math.floor(Math.random() * 256)
+            var b = Math.floor(Math.random() * 256)
+
+            enemyBox.style.background = `rgb(${r},${g},${b})`;
+            
+            enemyContainer.appendChild(enemyBox);
+        }
+        
+        setInterval(generateEnemy, 7000);
+        generateEnemy();
+
+        //check out or not
+        function checkCollision(){
+            if (isGameOver) return;  // Do nothing if game is over
+
+            const playerRect = player.getBoundingClientRect();
+            const enemies = document.querySelectorAll('.enemy');
+            const gameover = document.getElementById('gameover');
+
+            enemies.forEach(enemy => {
+                const enemyRect = enemy.getBoundingClientRect();
+
+                const overlap = !(playerRect.right < enemyRect.left ||
+                                playerRect.left > enemyRect.right ||
+                                playerRect.bottom < enemyRect.top ||
+                                playerRect.top > enemyRect.bottom);
+
+                if (overlap){
+                    gameover.innerHTML = 'gameover';
+                    isGameOver = true;  // Set game state to over
+                }
+            });
+        }
+
+        setInterval(checkCollision, 100);
+
+        //generate point
+        function generatePoint(){
+    if (isGameOver) return;  // Do nothing if game is over
+
+    var point = document.createElement('div');
+    point.classList.add('point');
+
+    var groundRect = groundContainer.getBoundingClientRect(); // Get the ground container dimensions
+    var pointWidth = 50; 
+    var pointHeight = 50;
+
+    var randomX = Math.floor(Math.random() * (groundRect.width - pointWidth));
+    var randomY = Math.floor(Math.random() * (groundRect.height - pointHeight));
+
+    point.style.left = randomX + 'px';
+    point.style.top = randomY + 'px';
+
+    console.log(`Generated point at: ${randomX}px, ${randomY}px`); // Debugging info
+
+    groundContainer.appendChild(point);
+
+    setTimeout(() => {
+        if (!isGameOver) {
+            point.remove();
+        }
+    }, 3000);
+}
+
+        setInterval(generatePoint, 5000);
+
+        //point gain
+        function points(){
+            if (isGameOver) return;  // Do nothing if game is over
+
+            const playerRect = player.getBoundingClientRect();
+            const points = document.querySelectorAll('.point');
+            var pointCount = document.getElementById('pointCount');
+            
+            points.forEach(point => {
+                const pointRect = point.getBoundingClientRect();
+
+                const overlap = !(playerRect.right < pointRect.left ||
+                                playerRect.left > pointRect.right ||
+                                playerRect.bottom < pointRect.top ||
+                                playerRect.top > pointRect.bottom);
+
+                if (overlap){
+                    score++;
+                    player.innerHTML = score;
+                    point.remove(); // Remove the point once it is collected
+                }
+            });
+        }
+
+        setInterval(points, 100);
+
+        // Touch event listeners for mobile devices
+        document.addEventListener('touchstart', handleTouchStart, false);
+        document.addEventListener('touchmove', handleTouchMove, false);
+
+        let xStart = null; // to store initial touch position
+
+        function handleTouchStart(e) {
+            if (isGameOver) return; // Do nothing if game is over
+
+            const firstTouch = e.touches[0]; // get the first touch point
+            xStart = firstTouch.clientX;
+        }
+
+        function handleTouchMove(e) {
+            if (isGameOver || !xStart) return; // Do nothing if game is over or no initial touch
+
+            const xMove = e.touches[0].clientX;
+            const xDiff = xMove - xStart;
+
+            const px = parseInt(window.getComputedStyle(player).getPropertyValue('left'));
+            const groundWidth = groundContainer.offsetWidth;
+            const playerWidth = player.offsetWidth;
+
+            let newLeft = px + xDiff; // Move based on touch difference
+
+            // Boundary Check
+            if (newLeft + playerWidth > groundWidth) {
+                newLeft = groundWidth - playerWidth; // prevent going beyond the boundary
+            } else if (newLeft < 0) {
+                newLeft = 0;
+            }
+            player.style.left = newLeft + 'px';
+            xStart = xMove; // update starting point
+        }
+    </script>
+</body>
+</html>
